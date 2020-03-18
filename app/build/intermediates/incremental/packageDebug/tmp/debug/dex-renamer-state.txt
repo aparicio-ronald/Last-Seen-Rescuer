@@ -1,0 +1,7 @@
+#Wed Mar 18 13:36:08 MDT 2020
+base.0=D\:\\Last-Seen-Rescuer\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\out\\classes.dex
+path.1=classes.dex
+renamed.1=classes2.dex
+path.0=classes.dex
+renamed.0=classes.dex
+base.1=D\:\\Last-Seen-Rescuer\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\out\\classes.dex
