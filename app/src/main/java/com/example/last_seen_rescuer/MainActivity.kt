@@ -24,15 +24,23 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        initializeButton()
+        initializeViewsAndAdapters()
+
+    }
+    private fun initializeButton(){
         submitButton = findViewById(R.id.button)
 
-        submitButton.setOnClickListener {
-            val intent = Intent(this, SelectionPage::class.java)
-            startActivity(intent)
-
-
+        submitButton.setOnClickListener{
+            if (requiredFieldsNotEmpty()) {
+                submitInfo()
+            }
         }
+    }
 
+    private fun submitInfo(){
+        val intent = Intent(this, SelectionPage::class.java)
+        startActivity(intent)
     }
 
     private fun initializeViewsAndAdapters() {
