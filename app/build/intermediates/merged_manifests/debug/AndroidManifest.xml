@@ -25,6 +25,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.example.last_seen_rescuer.BluetoothPage" />
+        <activity android:name="com.example.last_seen_rescuer.SelectionPage" />
     </application>
 
 </manifest>
