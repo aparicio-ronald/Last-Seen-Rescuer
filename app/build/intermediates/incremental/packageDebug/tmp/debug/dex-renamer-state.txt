@@ -1,0 +1,7 @@
+#Wed Mar 25 21:03:47 MDT 2020
+base.0=C\:\\Users\\Luis\\AndroidStudioProjects\\Last-Seen-Rescuer\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\out\\classes.dex
+path.1=classes.dex
+renamed.1=classes2.dex
+path.0=classes.dex
+renamed.0=classes.dex
+base.1=C\:\\Users\\Luis\\AndroidStudioProjects\\Last-Seen-Rescuer\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\out\\classes.dex

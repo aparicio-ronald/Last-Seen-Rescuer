@@ -1,5 +1,6 @@
 package com.example.last_seen_rescuer
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.*
@@ -39,6 +40,8 @@ class SelectionPage : AppCompatActivity() {
             Toast.makeText(applicationContext, profile, Toast.LENGTH_SHORT).show()
 
             // TODO: START CHECKPOINT PAGE WITH INTENT CONTAINING PROFILE INFORMATION
+            val intent = Intent(this, BluetoothPage::class.java)
+            startActivity(intent)
         }
     }
 
