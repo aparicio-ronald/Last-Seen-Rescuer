@@ -854,7 +854,6 @@ id tag_screen_reader_focusable
 id tag_transition_group
 id tag_unhandled_key_event_manager
 id tag_unhandled_key_listeners
-id temporary_add_profile_button
 id text
 id text2
 id textSpacerNoButtons
@@ -958,6 +957,9 @@ string abc_shareactionprovider_share_with_application
 string abc_toolbar_collapse_description
 string app_name
 string search_menu_title
+string server_itinerary
+string server_profiles
+string server_url
 string status_bar_notification_info_overflow
 style AlertDialog_AppCompat
 style AlertDialog_AppCompat_Light

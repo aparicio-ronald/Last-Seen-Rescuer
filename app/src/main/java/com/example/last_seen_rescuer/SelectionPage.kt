@@ -5,20 +5,18 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.*
-import java.util.*
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonArrayRequest
+import com.android.volley.toolbox.Volley
 import kotlin.collections.ArrayList
-
-/*
- * ALL VARIABLES AND FUNCTIONS WITH THE WORD TEMPORARY ONLY HERE FOR DEMO PURPOSES
- * UNTIL WE CONNECT THE MOBILE APP TO THE BACKEND
- */
 
 class SelectionPage : AppCompatActivity() {
 
     private lateinit var searchFieldsTextView : TextView
     private lateinit var profileListView : ListView
-    private lateinit var profileAdapter: ArrayAdapter<String>
-    private lateinit var profileArrayList: ArrayList<String>
+    private lateinit var profileAdapter: ArrayAdapter<Profile>
+    private lateinit var profileArrayList: ArrayList<Profile>
 
     private lateinit var firstName : String
     private lateinit var lastName : String
@@ -28,8 +26,6 @@ class SelectionPage : AppCompatActivity() {
     private lateinit var state : String
     private lateinit var zipCode : String
 
-    private lateinit var temporary_generateProfileButton : Button
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_selection_page)
@@ -37,22 +33,23 @@ class SelectionPage : AppCompatActivity() {
         initializeViewsAndAdapters()
         getSearchCriteria()
 
-        temporary_generateProfileButton.setOnClickListener {
-            profileArrayList.add("PROFILE NUMBER " + UUID.randomUUID())
-            profileAdapter.notifyDataSetChanged()
-        }
-
         profileListView.setOnItemClickListener {parent, view, position, id ->
-            val profile = profileAdapter.getItem(position)
+            val profile = profileAdapter.getItem(position)!!
 
-            Toast.makeText(applicationContext, profile, Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext, profile.toString(), Toast.LENGTH_SHORT).show()
 
             val intent = Intent(this, BluetoothPage::class.java)
 
-            intent.putExtra("profile", profile)
+            intent.putExtra("userIdentifier", profile.getUserIdentifier())
+            intent.putExtra("firstName", profile.getFirstName())
+            intent.putExtra("lastName", profile.getLastName())
+            intent.putExtra("dateOfBirth", profile.getDateOfBirth())
+            intent.putExtra("macAddress", profile.getMacAddress())
 
             startActivity(intent)
         }
+
+        updateProfileList()
     }
 
     private fun initializeViewsAndAdapters() {
@@ -62,8 +59,6 @@ class SelectionPage : AppCompatActivity() {
         profileAdapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, profileArrayList)
 
         profileListView.adapter = profileAdapter
-
-        temporary_generateProfileButton = findViewById(R.id.temporary_add_profile_button)
     }
 
     @SuppressLint("SetTextI18n")
@@ -83,8 +78,32 @@ class SelectionPage : AppCompatActivity() {
                 "City: " + city + "\n" +
                 "State: " + state + "\n" +
                 "Zip Code: " + zipCode
+    }
 
-        // TODO POPULATE SCROLLVIEW WITH PROFILES MATCHING SEARCH CRITERIA FROM DATABASE
-        // NEED USER IDENTIFIER TO FIND ITINERARY
+    private fun updateProfileList() {
+        val queue = Volley.newRequestQueue(this)
+        val urlString = getString(R.string.server_url) + getString(R.string.server_profiles) +
+                firstName + "/" + lastName
+
+        val getProfilesRequest = JsonArrayRequest(
+            Request.Method.GET, urlString, null,
+            Response.Listener { response ->
+
+                for (i in 0 until response.length()) {
+                    val profileItemJson = response.getJSONObject(i)
+                    val profile = Profile(profileItemJson)
+
+                    //FILTER OUT OPTIONALS
+
+                    profileArrayList.add(profile)
+                }
+
+                profileAdapter.notifyDataSetChanged()
+            },
+            Response.ErrorListener {
+                Toast.makeText(applicationContext, "COULD NOT CONTACT SERVER", Toast.LENGTH_SHORT).show()
+            })
+
+        queue.add(getProfilesRequest)
     }
 }

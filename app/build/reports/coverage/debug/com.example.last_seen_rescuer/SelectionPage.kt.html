@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SelectionPage.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">com.example.last_seen_rescuer</a> &gt; <span class="el_source">SelectionPage.kt</span></div><h1>SelectionPage.kt</h1><pre class="source lang-java linenums">package com.example.last_seen_rescuer
+
+import android.annotation.SuppressLint
+import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.widget.*
+import java.util.*
+import kotlin.collections.ArrayList
+
+/*
+ * ALL VARIABLES AND FUNCTIONS WITH THE WORD TEMPORARY ONLY HERE FOR DEMO PURPOSES
+ * UNTIL WE CONNECT THE MOBILE APP TO THE BACKEND
+ */
+
+<span class="fc" id="L16">class SelectionPage : AppCompatActivity() {</span>
+
+    private lateinit var searchFieldsTextView : TextView
+    private lateinit var profileListView : ListView
+    private lateinit var profileAdapter: ArrayAdapter&lt;String&gt;
+    private lateinit var profileArrayList: ArrayList&lt;String&gt;
+
+    private lateinit var firstName : String
+    private lateinit var lastName : String
+    private lateinit var dateOfBirth : String
+    private lateinit var streetAddress : String
+    private lateinit var city : String
+    private lateinit var state : String
+    private lateinit var zipCode : String
+
+    private lateinit var temporary_generateProfileButton : Button
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+<span class="fc" id="L34">        super.onCreate(savedInstanceState)</span>
+<span class="fc" id="L35">        setContentView(R.layout.activity_selection_page)</span>
+
+<span class="fc" id="L37">        initializeViewsAndAdapters()</span>
+<span class="fc" id="L38">        getSearchCriteria()</span>
+
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">        temporary_generateProfileButton.setOnClickListener {</span>
+<span class="fc" id="L41">            profileArrayList.add(&quot;PROFILE NUMBER &quot; + UUID.randomUUID())</span>
+<span class="fc" id="L42">            profileAdapter.notifyDataSetChanged()</span>
+<span class="fc" id="L43">        }</span>
+
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        profileListView.setOnItemClickListener {parent, view, position, id -&gt;</span>
+<span class="fc" id="L46">            val profile = profileAdapter.getItem(position)</span>
+
+<span class="fc" id="L48">            Toast.makeText(applicationContext, profile, Toast.LENGTH_SHORT).show()</span>
+
+<span class="fc" id="L50">            val intent = Intent(this, BluetoothPage::class.java)</span>
+
+<span class="fc" id="L52">            intent.putExtra(&quot;profile&quot;, profile)</span>
+
+<span class="fc" id="L54">            startActivity(intent)</span>
+<span class="fc" id="L55">        }</span>
+<span class="fc" id="L56">    }</span>
+
+    private fun initializeViewsAndAdapters() {
+<span class="fc" id="L59">        searchFieldsTextView = findViewById(R.id.search_fields_text_view)</span>
+<span class="fc" id="L60">        profileListView = findViewById(R.id.profile_list_view)</span>
+<span class="fc" id="L61">        profileArrayList = ArrayList()</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">        profileAdapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, profileArrayList)</span>
+
+<span class="pc bpc" id="L64" title="2 of 4 branches missed.">        profileListView.adapter = profileAdapter</span>
+
+<span class="fc" id="L66">        temporary_generateProfileButton = findViewById(R.id.temporary_add_profile_button)</span>
+<span class="fc" id="L67">    }</span>
+
+    @SuppressLint(&quot;SetTextI18n&quot;)
+    private fun getSearchCriteria() {
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">        firstName = intent.getStringExtra(&quot;firstName&quot;)!!</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        lastName = intent.getStringExtra(&quot;lastName&quot;)!!</span>
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">        dateOfBirth = intent.getStringExtra(&quot;dateOfBirth&quot;)!!</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">        streetAddress = intent.getStringExtra(&quot;streetAddress&quot;)!!</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">        city = intent.getStringExtra(&quot;city&quot;)!!</span>
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">        state = intent.getStringExtra(&quot;state&quot;)!!</span>
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">        zipCode = intent.getStringExtra(&quot;zipCode&quot;)!!</span>
+
+<span class="pc bpc" id="L79" title="2 of 4 branches missed.">        searchFieldsTextView.text = &quot;First Name: &quot; + firstName + &quot;\n&quot; +</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">                &quot;Last Name: &quot; + lastName + &quot;\n&quot; +</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">                &quot;Date Of Birth: &quot; + dateOfBirth + &quot;\n&quot; +</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">                &quot;Address: &quot; + streetAddress + &quot;\n&quot; +</span>
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">                &quot;City: &quot; + city + &quot;\n&quot; +</span>
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">                &quot;State: &quot; + state + &quot;\n&quot; +</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">                &quot;Zip Code: &quot; + zipCode</span>
+
+        // TODO POPULATE SCROLLVIEW WITH PROFILES MATCHING SEARCH CRITERIA FROM DATABASE
+        // NEED USER IDENTIFIER TO FIND ITINERARY
+<span class="fc" id="L89">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span>Generated by the Android Gradle plugin 3.6.1</div></body></html>

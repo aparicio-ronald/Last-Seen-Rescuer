@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Last Seen Rescuer</string>
+    <string name="server_url">https://lit-thicket-07529.herokuapp.com</string>
+    <string name="server_profiles">/profiles/</string>
+    <string name="server_itinerary">/itinerary/</string>
 </resources>

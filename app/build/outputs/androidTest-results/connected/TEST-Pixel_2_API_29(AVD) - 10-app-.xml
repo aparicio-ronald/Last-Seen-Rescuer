@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.example.last_seen_rescuer.BluetoothPageTest" tests="3" failures="0" errors="0" skipped="0" time="26.636" timestamp="2020-03-27T18:23:19" hostname="localhost">
+  <properties>
+    <property name="device" value="Pixel_2_API_29(AVD) - 10" />
+    <property name="flavor" value="" />
+    <property name="project" value="app" />
+  </properties>
+  <testcase name="getLogDataTest" classname="com.example.last_seen_rescuer.BluetoothPageTest" time="4.252" />
+  <testcase name="submitTest" classname="com.example.last_seen_rescuer.MainActivityTest" time="11.319" />
+  <testcase name="selectProfileTest" classname="com.example.last_seen_rescuer.SelectionPageTest" time="5.361" />
+</testsuite>
