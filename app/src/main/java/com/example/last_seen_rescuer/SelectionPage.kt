@@ -56,7 +56,7 @@ class SelectionPage : AppCompatActivity() {
         searchFieldsTextView = findViewById(R.id.search_fields_text_view)
         profileListView = findViewById(R.id.profile_list_view)
         profileArrayList = ArrayList()
-        profileAdapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, profileArrayList)
+        profileAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, profileArrayList)
 
         profileListView.adapter = profileAdapter
     }
