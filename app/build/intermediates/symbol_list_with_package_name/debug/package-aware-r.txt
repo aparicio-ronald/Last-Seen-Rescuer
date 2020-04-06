@@ -781,6 +781,7 @@ id image
 id info
 id invisible
 id italic
+id itinerary_list_view
 id lastName
 id left
 id line1
