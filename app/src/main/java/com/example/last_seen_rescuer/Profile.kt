@@ -30,6 +30,22 @@ class Profile(profileItemJson: JSONObject) {
         return dateOfBirth
     }
 
+    fun getStreetAddress() : String {
+        return streetAddress
+    }
+
+    fun getCity() : String {
+        return city
+    }
+
+    fun getState() : String {
+        return state
+    }
+
+    fun getZipcode() : String {
+        return zipCode
+    }
+
     fun getMacAddress() : String {
         return macAddress
     }

@@ -9,28 +9,9 @@ class ItineraryItem (itineraryItemJSON : JSONObject) {
     private val minute = itineraryItemJSON.getString("minute")
     private val ampm = itineraryItemJSON.getString("ampm")
 
-    fun getTrail() : String {
-        return trail
-    }
-
-    fun getDate() : String {
-        return date
-    }
-
-    fun getHour() : String {
-        return hour
-    }
-
-    fun getMinute() : String {
-        return minute
-    }
-
-    fun getAmPm() : String {
-        return ampm
-    }
-
     override fun toString(): String {
-        return "Trail: " + trail + "\nDate: " + date + "\nTime: " + hour + ":" + minute +  " " +
-                ampm
+        return "Trail: " + trail + "\n" +
+                "Date: " + date + "\n" +
+                "Time: " + hour + ":" + minute +  " " + ampm
     }
 }

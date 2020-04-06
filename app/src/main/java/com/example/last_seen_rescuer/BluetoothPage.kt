@@ -1,5 +1,6 @@
 package com.example.last_seen_rescuer
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.*
@@ -16,7 +17,7 @@ class BluetoothPage : AppCompatActivity() {
     private var temporary_dummy_data = 0
 
     private lateinit var itineraryAdapter : ArrayAdapter<ItineraryItem>
-    private lateinit var itineraryArrayList : ArrayList <ItineraryItem>
+    private lateinit var itineraryArrayList : ArrayList<ItineraryItem>
 
     private lateinit var bluetoothLogAdapter : ArrayAdapter<String>
     private lateinit var bluetoothLogArrayList : ArrayList<String>
@@ -61,9 +62,11 @@ class BluetoothPage : AppCompatActivity() {
         profileInformation = findViewById(R.id.profile_information_text_view)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun pullProfileInformationFromExtras() {
         profileInformation.text = "NAME: " + intent.getStringExtra("firstName") + " " +
-                intent.getStringExtra("lastName") + "\n" + " Date of Birth: " +intent.getStringExtra("dateOfBirth")
+                intent.getStringExtra("lastName") + "\n" +
+                "Date of Birth: " +intent.getStringExtra("dateOfBirth")
 
         userIdentifier = intent.getStringExtra("userIdentifier")!!
         macAddress = intent.getStringExtra("macAddress")!!

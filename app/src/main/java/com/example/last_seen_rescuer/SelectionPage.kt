@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.*
 import com.android.volley.Request
 import com.android.volley.Response
@@ -93,7 +94,25 @@ class SelectionPage : AppCompatActivity() {
                     val profileItemJson = response.getJSONObject(i)
                     val profile = Profile(profileItemJson)
 
-                    //FILTER OUT OPTIONALS
+                    if (!profile.getDateOfBirth().contains(dateOfBirth)) {
+                        continue
+                    }
+
+                    if (!profile.getStreetAddress().contains(streetAddress)) {
+                        continue
+                    }
+
+                    if (!profile.getCity().contains(city)) {
+                        continue
+                    }
+
+                    if (!profile.getState().contains(state)) {
+                        continue
+                    }
+
+                    if (!profile.getZipcode().contains(zipCode)) {
+                        continue
+                    }
 
                     profileArrayList.add(profile)
                 }
