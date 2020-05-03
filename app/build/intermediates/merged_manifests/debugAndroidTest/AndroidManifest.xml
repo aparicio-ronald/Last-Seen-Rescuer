@@ -3,7 +3,7 @@
     package="com.example.last_seen_rescuer.test" >
 
     <uses-sdk
-        android:minSdkVersion="29"
+        android:minSdkVersion="27"
         android:targetSdkVersion="29" />
 
     <instrumentation

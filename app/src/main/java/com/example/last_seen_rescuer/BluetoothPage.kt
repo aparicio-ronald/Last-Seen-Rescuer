@@ -3,7 +3,6 @@ package com.example.last_seen_rescuer
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothServerSocket
 import android.bluetooth.BluetoothSocket
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -19,9 +18,6 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.Volley
-import java.io.InputStream
-import java.io.OutputStream
-import java.lang.Exception
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -47,7 +43,7 @@ class BluetoothPage : AppCompatActivity() {
 
     private val mReceiver = object : BroadcastReceiver() {
         override fun onReceive(context : Context, intent : Intent) {
-            Log.i("BLUETOOTH", "BroadcastReceiver onReceive()")
+            Log.i("LAST_SEEN_BLUETOOTH", "BroadcastReceiver onReceive()")
             handleBTDevice(intent)
         }
     }
@@ -60,7 +56,7 @@ class BluetoothPage : AppCompatActivity() {
         pullProfileInformationFromExtras()
 
         getDataButton.setOnClickListener {
-            Log.i("BLUETOOTH", "GET DATA BUTTON CLICKED")
+            Log.i("LAST_SEEN_BLUETOOTH", "GET DATA BUTTON CLICKED")
 
             setUpBroadcastReceiver()
             setUpDiscovery()
@@ -85,51 +81,66 @@ class BluetoothPage : AppCompatActivity() {
             ActivityCompat.requestPermissions(this,
                 arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
                 ACCESS_FINE_LOCATION)
-            Log.i("BLUETOOTH", "GET PERMISSION")
+            Log.i("LAST_SEEN_BLUETOOTH", "GET PERMISSION")
             return
         }
     }
 
     private fun handleBTDevice(intent : Intent) {
-        Log.i("BLUETOOTH", "HANDLE BT DEVICE")
+        Log.i("LAST_SEEN_BLUETOOTH", "HANDLE BT DEVICE")
         val action = intent.action
 
         if (BluetoothDevice.ACTION_FOUND == action) {
-            val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
-            val deviceMacAddress = device.address
+            val foundDevice = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
 
-            Log.i("BLUETOOTH", deviceMacAddress)
+            Log.i("LAST_SEEN_BLUETOOTH", foundDevice.name)
 
-            RequestLogDataThread(device, deviceMacAddress).start()
+            if (foundDevice.name.contains("LAST_SEEN")) {
+                Log.i("LAST_SEEN_BLUETOOTH", "CHECK POINT : ${foundDevice.address}")
+                mBlueToothAdapter.cancelDiscovery()
+                RequestLogDataThread(foundDevice).start()
+            }
         }
     }
 
-    private inner class RequestLogDataThread(mmDevice: BluetoothDevice, deviceMacAddress: String): Thread() {
+    private inner class RequestLogDataThread(mmDevice: BluetoothDevice): Thread() {
         private var mmSocket: BluetoothSocket? = null
         private var targetMacAddress: ByteArray
 
         init {
-            Log.i("BLUETOOTH", "REQUEST LOG DATA THREAD")
+            Log.i("LAST_SEEN_BLUETOOTH", "REQUEST LOG DATA THREAD")
             mmSocket = mmDevice.createInsecureRfcommSocketToServiceRecord(lastSeenUUID)
-            targetMacAddress = deviceMacAddress.toByteArray()
+            targetMacAddress = macAddress.toByteArray()
         }
 
         override fun run() {
             mmSocket!!.connect()
-            Log.i("BLUETOOTH", "CONNECTION ESTABLISHED")
+            Log.i("LAST_SEEN_BLUETOOTH", "CONNECTION ESTABLISHED")
 
             val outputStream = mmSocket!!.outputStream
             outputStream.write(targetMacAddress)
 
-            Log.i("BLUETOOTH", "REQUEST SENT")
+            Log.i("LAST_SEEN_BLUETOOTH", "REQUEST SENT")
 
             val inputStream = mmSocket!!.inputStream
-            val logData = ByteArray(255)
+            val logData = ByteArray(2048)
+            val logDataString : String
             inputStream.read(logData)
 
-            Log.i("DATA", logData.toString(Charsets.UTF_8))
+            logDataString = logData.toString(Charsets.UTF_8)
 
-            Log.i("BLUETOOTH", "REPLY RECEIVED")
+            Log.i("LAST_SEEN_BLUETOOTH", logDataString)
+
+            val logDataStringSplit = logDataString.split("\n")
+
+            runOnUiThread {
+                for (i in 0 until logDataStringSplit.size - 1) {
+                    bluetoothLogAdapter.add(logDataStringSplit[i])
+                }
+                bluetoothLogAdapter.notifyDataSetChanged()
+            }
+
+            mmSocket!!.close()
         }
     }
 

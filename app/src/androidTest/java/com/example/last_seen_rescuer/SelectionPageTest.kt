@@ -2,7 +2,6 @@ package com.example.last_seen_rescuer
 
 import android.content.Intent
 import androidx.test.espresso.Espresso.onData
-import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
@@ -22,21 +21,19 @@ class SelectionPageTest {
     @JvmField
     val selectionPageTestRule = ActivityTestRule(SelectionPage::class.java, false, false)
 
-    private val addProfileButton = onView(withId(R.id.temporary_add_profile_button))
-
     @Before
     fun initIntentAndBundle() {
         Intents.init()
 
         val intent = Intent()
 
-        intent.putExtra("firstName", "TEST")
-        intent.putExtra("lastName", "TEST")
-        intent.putExtra("dateOfBirth", "01/01/1900")
-        intent.putExtra("streetAddress", "TEST STREET")
-        intent.putExtra("city", "TEST")
-        intent.putExtra("state", "TT")
-        intent.putExtra("zipCode", "11111")
+        intent.putExtra("firstName", "First")
+        intent.putExtra("lastName", "Last")
+        intent.putExtra("dateOfBirth", "")
+        intent.putExtra("streetAddress", "")
+        intent.putExtra("city", "")
+        intent.putExtra("state", "")
+        intent.putExtra("zipCode", "")
 
         selectionPageTestRule.launchActivity(intent)
     }
@@ -48,7 +45,7 @@ class SelectionPageTest {
 
     @Test
     fun selectProfileTest() {
-        addProfileButton.perform(click())
+        Thread.sleep(1000)
 
         onData(anything()).
                 inAdapterView(withId(R.id.profile_list_view)).

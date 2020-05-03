@@ -18,19 +18,37 @@ class BluetoothPageTest {
     @JvmField
     val bluetoothPageTestRule = ActivityTestRule(BluetoothPage::class.java, false, false)
 
-    private val addLogDataButton = onView(withId(R.id.get_data_button))
+    private val requestLogDataButton = onView(withId(R.id.get_data_button))
 
     @Before
     fun initBundle() {
         val intent = Intent()
 
-        intent.putExtra("profile", "TEST")
+        intent.putExtra("firstName", "First")
+        intent.putExtra("lastName", "Last")
+        intent.putExtra("dateOfBirth", "11/11/1111")
+        intent.putExtra("userIdentifier", "bqlmFPzO7lX2dbeRZ8yBugl2c4u2")
+        intent.putExtra("macAddress", "48:A4:72:54:72:BA")
         bluetoothPageTestRule.launchActivity(intent)
     }
 
     @Test
+    fun itineraryTest() {
+        Thread.sleep(1000)
+
+        Espresso.onData(CoreMatchers.anything()).
+            inAdapterView(withId(R.id.itinerary_list_view)).
+            atPosition(0).
+            check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+    }
+
+    @Test
     fun getLogDataTest() {
-        addLogDataButton.perform(click())
+        Thread.sleep(1000)
+
+        requestLogDataButton.perform(click())
+
+        Thread.sleep(10000)
 
         Espresso.onData(CoreMatchers.anything()).
             inAdapterView(withId(R.id.bluetooth_checkpoint_data_list_view)).

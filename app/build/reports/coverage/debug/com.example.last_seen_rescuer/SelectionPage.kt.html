@@ -4,21 +4,20 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.*
-import java.util.*
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonArrayRequest
+import com.android.volley.toolbox.Volley
 import kotlin.collections.ArrayList
 
-/*
- * ALL VARIABLES AND FUNCTIONS WITH THE WORD TEMPORARY ONLY HERE FOR DEMO PURPOSES
- * UNTIL WE CONNECT THE MOBILE APP TO THE BACKEND
- */
-
-<span class="fc" id="L16">class SelectionPage : AppCompatActivity() {</span>
+<span class="fc" id="L15">class SelectionPage : AppCompatActivity() {</span>
 
     private lateinit var searchFieldsTextView : TextView
     private lateinit var profileListView : ListView
-    private lateinit var profileAdapter: ArrayAdapter&lt;String&gt;
-    private lateinit var profileArrayList: ArrayList&lt;String&gt;
+    private lateinit var profileAdapter: ArrayAdapter&lt;Profile&gt;
+    private lateinit var profileArrayList: ArrayList&lt;Profile&gt;
 
     private lateinit var firstName : String
     private lateinit var lastName : String
@@ -28,64 +27,103 @@ import kotlin.collections.ArrayList
     private lateinit var state : String
     private lateinit var zipCode : String
 
-    private lateinit var temporary_generateProfileButton : Button
-
     override fun onCreate(savedInstanceState: Bundle?) {
-<span class="fc" id="L34">        super.onCreate(savedInstanceState)</span>
-<span class="fc" id="L35">        setContentView(R.layout.activity_selection_page)</span>
+<span class="fc" id="L31">        super.onCreate(savedInstanceState)</span>
+<span class="fc" id="L32">        setContentView(R.layout.activity_selection_page)</span>
 
-<span class="fc" id="L37">        initializeViewsAndAdapters()</span>
-<span class="fc" id="L38">        getSearchCriteria()</span>
+<span class="fc" id="L34">        initializeViewsAndAdapters()</span>
+<span class="fc" id="L35">        getSearchCriteria()</span>
 
-<span class="pc bpc" id="L40" title="1 of 2 branches missed.">        temporary_generateProfileButton.setOnClickListener {</span>
-<span class="fc" id="L41">            profileArrayList.add(&quot;PROFILE NUMBER &quot; + UUID.randomUUID())</span>
-<span class="fc" id="L42">            profileAdapter.notifyDataSetChanged()</span>
-<span class="fc" id="L43">        }</span>
+<span class="pc bpc" id="L37" title="1 of 2 branches missed.">        profileListView.setOnItemClickListener {parent, view, position, id -&gt;</span>
+<span class="pc bpc" id="L38" title="1 of 2 branches missed.">            val profile = profileAdapter.getItem(position)!!</span>
 
-<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        profileListView.setOnItemClickListener {parent, view, position, id -&gt;</span>
-<span class="fc" id="L46">            val profile = profileAdapter.getItem(position)</span>
+<span class="fc" id="L40">            Toast.makeText(applicationContext, profile.toString(), Toast.LENGTH_SHORT).show()</span>
 
-<span class="fc" id="L48">            Toast.makeText(applicationContext, profile, Toast.LENGTH_SHORT).show()</span>
+<span class="fc" id="L42">            val intent = Intent(this, BluetoothPage::class.java)</span>
 
-<span class="fc" id="L50">            val intent = Intent(this, BluetoothPage::class.java)</span>
+<span class="fc" id="L44">            intent.putExtra(&quot;userIdentifier&quot;, profile.getUserIdentifier())</span>
+<span class="fc" id="L45">            intent.putExtra(&quot;firstName&quot;, profile.getFirstName())</span>
+<span class="fc" id="L46">            intent.putExtra(&quot;lastName&quot;, profile.getLastName())</span>
+<span class="fc" id="L47">            intent.putExtra(&quot;dateOfBirth&quot;, profile.getDateOfBirth())</span>
+<span class="fc" id="L48">            intent.putExtra(&quot;macAddress&quot;, profile.getMacAddress())</span>
 
-<span class="fc" id="L52">            intent.putExtra(&quot;profile&quot;, profile)</span>
+<span class="fc" id="L50">            startActivity(intent)</span>
+<span class="fc" id="L51">        }</span>
 
-<span class="fc" id="L54">            startActivity(intent)</span>
-<span class="fc" id="L55">        }</span>
-<span class="fc" id="L56">    }</span>
+<span class="fc" id="L53">        updateProfileList()</span>
+<span class="fc" id="L54">    }</span>
 
     private fun initializeViewsAndAdapters() {
-<span class="fc" id="L59">        searchFieldsTextView = findViewById(R.id.search_fields_text_view)</span>
-<span class="fc" id="L60">        profileListView = findViewById(R.id.profile_list_view)</span>
-<span class="fc" id="L61">        profileArrayList = ArrayList()</span>
-<span class="pc bpc" id="L62" title="1 of 2 branches missed.">        profileAdapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, profileArrayList)</span>
+<span class="fc" id="L57">        searchFieldsTextView = findViewById(R.id.search_fields_text_view)</span>
+<span class="fc" id="L58">        profileListView = findViewById(R.id.profile_list_view)</span>
+<span class="fc" id="L59">        profileArrayList = ArrayList()</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">        profileAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, profileArrayList)</span>
 
-<span class="pc bpc" id="L64" title="2 of 4 branches missed.">        profileListView.adapter = profileAdapter</span>
-
-<span class="fc" id="L66">        temporary_generateProfileButton = findViewById(R.id.temporary_add_profile_button)</span>
-<span class="fc" id="L67">    }</span>
+<span class="pc bpc" id="L62" title="2 of 4 branches missed.">        profileListView.adapter = profileAdapter</span>
+<span class="fc" id="L63">    }</span>
 
     @SuppressLint(&quot;SetTextI18n&quot;)
     private fun getSearchCriteria() {
-<span class="pc bpc" id="L71" title="1 of 2 branches missed.">        firstName = intent.getStringExtra(&quot;firstName&quot;)!!</span>
-<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        lastName = intent.getStringExtra(&quot;lastName&quot;)!!</span>
-<span class="pc bpc" id="L73" title="1 of 2 branches missed.">        dateOfBirth = intent.getStringExtra(&quot;dateOfBirth&quot;)!!</span>
-<span class="pc bpc" id="L74" title="1 of 2 branches missed.">        streetAddress = intent.getStringExtra(&quot;streetAddress&quot;)!!</span>
-<span class="pc bpc" id="L75" title="1 of 2 branches missed.">        city = intent.getStringExtra(&quot;city&quot;)!!</span>
-<span class="pc bpc" id="L76" title="1 of 2 branches missed.">        state = intent.getStringExtra(&quot;state&quot;)!!</span>
-<span class="pc bpc" id="L77" title="1 of 2 branches missed.">        zipCode = intent.getStringExtra(&quot;zipCode&quot;)!!</span>
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">        firstName = intent.getStringExtra(&quot;firstName&quot;)!!</span>
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">        lastName = intent.getStringExtra(&quot;lastName&quot;)!!</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">        dateOfBirth = intent.getStringExtra(&quot;dateOfBirth&quot;)!!</span>
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">        streetAddress = intent.getStringExtra(&quot;streetAddress&quot;)!!</span>
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">        city = intent.getStringExtra(&quot;city&quot;)!!</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        state = intent.getStringExtra(&quot;state&quot;)!!</span>
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">        zipCode = intent.getStringExtra(&quot;zipCode&quot;)!!</span>
 
-<span class="pc bpc" id="L79" title="2 of 4 branches missed.">        searchFieldsTextView.text = &quot;First Name: &quot; + firstName + &quot;\n&quot; +</span>
-<span class="pc bpc" id="L80" title="1 of 2 branches missed.">                &quot;Last Name: &quot; + lastName + &quot;\n&quot; +</span>
-<span class="pc bpc" id="L81" title="1 of 2 branches missed.">                &quot;Date Of Birth: &quot; + dateOfBirth + &quot;\n&quot; +</span>
-<span class="pc bpc" id="L82" title="1 of 2 branches missed.">                &quot;Address: &quot; + streetAddress + &quot;\n&quot; +</span>
-<span class="pc bpc" id="L83" title="1 of 2 branches missed.">                &quot;City: &quot; + city + &quot;\n&quot; +</span>
-<span class="pc bpc" id="L84" title="1 of 2 branches missed.">                &quot;State: &quot; + state + &quot;\n&quot; +</span>
-<span class="pc bpc" id="L85" title="1 of 2 branches missed.">                &quot;Zip Code: &quot; + zipCode</span>
+<span class="pc bpc" id="L75" title="2 of 4 branches missed.">        searchFieldsTextView.text = &quot;First Name: &quot; + firstName + &quot;\n&quot; +</span>
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">                &quot;Last Name: &quot; + lastName + &quot;\n&quot; +</span>
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">                &quot;Date Of Birth: &quot; + dateOfBirth + &quot;\n&quot; +</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">                &quot;Address: &quot; + streetAddress + &quot;\n&quot; +</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">                &quot;City: &quot; + city + &quot;\n&quot; +</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">                &quot;State: &quot; + state + &quot;\n&quot; +</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">                &quot;Zip Code: &quot; + zipCode</span>
+<span class="fc" id="L82">    }</span>
 
-        // TODO POPULATE SCROLLVIEW WITH PROFILES MATCHING SEARCH CRITERIA FROM DATABASE
-        // NEED USER IDENTIFIER TO FIND ITINERARY
-<span class="fc" id="L89">    }</span>
+    private fun updateProfileList() {
+<span class="fc" id="L85">        val queue = Volley.newRequestQueue(this)</span>
+<span class="fc" id="L86">        val urlString = getString(R.string.server_url) + getString(R.string.server_profiles) +</span>
+<span class="pc bpc" id="L87" title="2 of 4 branches missed.">                firstName + &quot;/&quot; + lastName</span>
+
+<span class="fc" id="L89">        val getProfilesRequest = JsonArrayRequest(</span>
+<span class="fc" id="L90">            Request.Method.GET, urlString, null,</span>
+<span class="fc" id="L91">            Response.Listener { response -&gt;</span>
+
+<span class="fc bfc" id="L93" title="All 2 branches covered.">                for (i in 0 until response.length()) {</span>
+<span class="fc" id="L94">                    val profileItemJson = response.getJSONObject(i)</span>
+<span class="fc" id="L95">                    val profile = Profile(profileItemJson)</span>
+
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">                    if (!profile.getDateOfBirth().contains(dateOfBirth)) {</span>
+<span class="nc" id="L98">                        continue</span>
+                    }
+
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">                    if (!profile.getStreetAddress().contains(streetAddress)) {</span>
+<span class="nc" id="L102">                        continue</span>
+                    }
+
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">                    if (!profile.getCity().contains(city)) {</span>
+<span class="nc" id="L106">                        continue</span>
+                    }
+
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">                    if (!profile.getState().contains(state)) {</span>
+<span class="nc" id="L110">                        continue</span>
+                    }
+
+<span class="pc bpc" id="L113" title="1 of 2 branches missed.">                    if (!profile.getZipcode().contains(zipCode)) {</span>
+<span class="nc" id="L114">                        continue</span>
+                    }
+
+<span class="fc" id="L117">                    profileArrayList.add(profile)</span>
+                }
+
+<span class="fc" id="L120">                profileAdapter.notifyDataSetChanged()</span>
+<span class="fc" id="L121">            },</span>
+<span class="fc" id="L122">            Response.ErrorListener {</span>
+<span class="nc" id="L123">                Toast.makeText(applicationContext, &quot;COULD NOT CONTACT SERVER&quot;, Toast.LENGTH_SHORT).show()</span>
+<span class="nc" id="L124">            })</span>
+
+<span class="fc" id="L126">        queue.add(getProfilesRequest)</span>
+<span class="fc" id="L127">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span>Generated by the Android Gradle plugin 3.6.1</div></body></html>

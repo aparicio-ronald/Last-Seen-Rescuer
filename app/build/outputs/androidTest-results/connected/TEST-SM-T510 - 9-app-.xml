@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.example.last_seen_rescuer.BluetoothPageTest" tests="4" failures="0" errors="0" skipped="0" time="22.96" timestamp="2020-05-03T18:46:03" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-T510 - 9" />
+    <property name="flavor" value="" />
+    <property name="project" value="app" />
+  </properties>
+  <testcase name="getLogDataTest" classname="com.example.last_seen_rescuer.BluetoothPageTest" time="12.43" />
+  <testcase name="itineraryTest" classname="com.example.last_seen_rescuer.BluetoothPageTest" time="1.778" />
+  <testcase name="submitTest" classname="com.example.last_seen_rescuer.MainActivityTest" time="5.514" />
+  <testcase name="selectProfileTest" classname="com.example.last_seen_rescuer.SelectionPageTest" time="2.313" />
+</testsuite>

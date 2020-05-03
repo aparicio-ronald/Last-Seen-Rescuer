@@ -1,55 +1,207 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BluetoothPage.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">com.example.last_seen_rescuer</a> &gt; <span class="el_source">BluetoothPage.kt</span></div><h1>BluetoothPage.kt</h1><pre class="source lang-java linenums">package com.example.last_seen_rescuer
 
+import android.annotation.SuppressLint
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothSocket
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.ListView
-import android.widget.TextView
+import android.util.Log
+import android.widget.*
+import androidx.core.app.ActivityCompat
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonArrayRequest
+import com.android.volley.toolbox.Volley
+import java.util.*
+import kotlin.collections.ArrayList
 
-<span class="fc" id="L10">class BluetoothPage : AppCompatActivity() {</span>
+<span class="fc" id="L24">class BluetoothPage : AppCompatActivity() {</span>
 
     private lateinit var profileInformation : TextView
-
+    private lateinit var itineraryListView : ListView
     private lateinit var bluetoothLogListView : ListView
-    private var temporary_dummy_data = 0
+
+    private lateinit var itineraryAdapter : ArrayAdapter&lt;ItineraryItem&gt;
+    private lateinit var itineraryArrayList : ArrayList&lt;ItineraryItem&gt;
 
     private lateinit var bluetoothLogAdapter : ArrayAdapter&lt;String&gt;
     private lateinit var bluetoothLogArrayList : ArrayList&lt;String&gt;
 
     private lateinit var getDataButton : Button
 
+    private lateinit var userIdentifier : String
+    private lateinit var macAddress : String
+
+    private lateinit var lastSeenUUID : UUID
+    private lateinit var mBlueToothAdapter: BluetoothAdapter
+
+<span class="fc" id="L44">    private val mReceiver = object : BroadcastReceiver() {</span>
+        override fun onReceive(context : Context, intent : Intent) {
+<span class="fc" id="L46">            Log.i(&quot;LAST_SEEN_BLUETOOTH&quot;, &quot;BroadcastReceiver onReceive()&quot;)</span>
+<span class="fc" id="L47">            handleBTDevice(intent)</span>
+<span class="fc" id="L48">        }</span>
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
-<span class="fc" id="L23">        super.onCreate(savedInstanceState)</span>
-<span class="fc" id="L24">        setContentView(R.layout.activity_bluetooth_page)</span>
+<span class="fc" id="L52">        super.onCreate(savedInstanceState)</span>
+<span class="fc" id="L53">        setContentView(R.layout.activity_bluetooth_page)</span>
 
-<span class="fc" id="L26">        initializeViewsAndAdapters()</span>
-<span class="fc" id="L27">        pullProfileInformationFromExtras()</span>
+<span class="fc" id="L55">        initializeViewsAndAdapters()</span>
+<span class="fc" id="L56">        pullProfileInformationFromExtras()</span>
 
-<span class="pc bpc" id="L29" title="1 of 2 branches missed.">        getDataButton.setOnClickListener {</span>
-<span class="fc" id="L30">            bluetoothLogArrayList.add(&quot;DUMMY LOG DATA &quot; + temporary_dummy_data)</span>
-<span class="fc" id="L31">            bluetoothLogAdapter.notifyDataSetChanged()</span>
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">        getDataButton.setOnClickListener {</span>
+<span class="fc" id="L59">            Log.i(&quot;LAST_SEEN_BLUETOOTH&quot;, &quot;GET DATA BUTTON CLICKED&quot;)</span>
 
-<span class="fc" id="L33">            temporary_dummy_data++</span>
+<span class="fc" id="L61">            setUpBroadcastReceiver()</span>
+<span class="fc" id="L62">            setUpDiscovery()</span>
+<span class="fc" id="L63">        }</span>
+<span class="fc" id="L64">    }</span>
 
-            // TODO : GET DATA FROM BLUETOOTH CHECKPOINTS FOR THE GIVEN MAC ADDRESS
-<span class="fc" id="L36">        }</span>
-<span class="fc" id="L37">    }</span>
+    private fun setUpDiscovery() {
+<span class="fc" id="L67">        val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)</span>
+<span class="fc" id="L68">        registerReceiver(mReceiver, filter)</span>
+
+<span class="pc bpc" id="L70" title="2 of 4 branches missed.">        mBlueToothAdapter!!.startDiscovery()</span>
+<span class="fc" id="L71">    }</span>
+
+    private fun setUpBroadcastReceiver() {
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">        if (ActivityCompat.checkSelfPermission(</span>
+<span class="fc" id="L75">                this, android.Manifest.permission.ACCESS_FINE_LOCATION) !=</span>
+                PackageManager.PERMISSION_GRANTED &amp;&amp;
+<span class="nc bnc" id="L77" title="All 2 branches missed.">                ActivityCompat.checkSelfPermission(this,</span>
+<span class="nc" id="L78">                    android.Manifest.permission.ACCESS_COARSE_LOCATION)</span>
+                != PackageManager.PERMISSION_GRANTED)
+        {
+<span class="nc" id="L81">            ActivityCompat.requestPermissions(this,</span>
+<span class="nc" id="L82">                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),</span>
+<span class="nc" id="L83">                ACCESS_FINE_LOCATION)</span>
+<span class="nc" id="L84">            Log.i(&quot;LAST_SEEN_BLUETOOTH&quot;, &quot;GET PERMISSION&quot;)</span>
+<span class="nc" id="L85">            return</span>
+        }
+<span class="fc" id="L87">    }</span>
+
+    private fun handleBTDevice(intent : Intent) {
+<span class="fc" id="L90">        Log.i(&quot;LAST_SEEN_BLUETOOTH&quot;, &quot;HANDLE BT DEVICE&quot;)</span>
+<span class="fc" id="L91">        val action = intent.action</span>
+
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">        if (BluetoothDevice.ACTION_FOUND == action) {</span>
+<span class="fc" id="L94">            val foundDevice = intent.getParcelableExtra&lt;BluetoothDevice&gt;(BluetoothDevice.EXTRA_DEVICE)</span>
+
+<span class="fc" id="L96">            Log.i(&quot;LAST_SEEN_BLUETOOTH&quot;, foundDevice.name)</span>
+
+<span class="fc bfc" id="L98" title="All 2 branches covered.">            if (foundDevice.name.contains(&quot;LAST_SEEN&quot;)) {</span>
+<span class="fc" id="L99">                Log.i(&quot;LAST_SEEN_BLUETOOTH&quot;, &quot;CHECK POINT : ${foundDevice.address}&quot;)</span>
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">                mBlueToothAdapter.cancelDiscovery()</span>
+<span class="fc" id="L101">                RequestLogDataThread(foundDevice).start()</span>
+            }
+        }
+<span class="fc" id="L104">    }</span>
+
+<span class="fc" id="L106">    private inner class RequestLogDataThread(mmDevice: BluetoothDevice): Thread() {</span>
+        private var mmSocket: BluetoothSocket? = null
+        private var targetMacAddress: ByteArray
+
+        init {
+<span class="fc" id="L111">            Log.i(&quot;LAST_SEEN_BLUETOOTH&quot;, &quot;REQUEST LOG DATA THREAD&quot;)</span>
+<span class="fc" id="L112">            mmSocket = mmDevice.createInsecureRfcommSocketToServiceRecord(lastSeenUUID)</span>
+<span class="pc bpc" id="L113" title="1 of 2 branches missed.">            targetMacAddress = macAddress.toByteArray()</span>
+<span class="fc" id="L114">        }</span>
+
+        override fun run() {
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">            mmSocket!!.connect()</span>
+<span class="fc" id="L118">            Log.i(&quot;LAST_SEEN_BLUETOOTH&quot;, &quot;CONNECTION ESTABLISHED&quot;)</span>
+
+<span class="pc bpc" id="L120" title="1 of 2 branches missed.">            val outputStream = mmSocket!!.outputStream</span>
+<span class="fc" id="L121">            outputStream.write(targetMacAddress)</span>
+
+<span class="fc" id="L123">            Log.i(&quot;LAST_SEEN_BLUETOOTH&quot;, &quot;REQUEST SENT&quot;)</span>
+
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">            val inputStream = mmSocket!!.inputStream</span>
+<span class="fc" id="L126">            val logData = ByteArray(2048)</span>
+<span class="fc" id="L127">            val logDataString : String</span>
+<span class="fc" id="L128">            inputStream.read(logData)</span>
+
+<span class="fc" id="L130">            logDataString = logData.toString(Charsets.UTF_8)</span>
+
+<span class="fc" id="L132">            Log.i(&quot;LAST_SEEN_BLUETOOTH&quot;, logDataString)</span>
+
+<span class="fc" id="L134">            val logDataStringSplit = logDataString.split(&quot;\n&quot;)</span>
+
+<span class="fc" id="L136">            runOnUiThread {</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">                for (i in 0 until logDataStringSplit.size - 1) {</span>
+<span class="fc" id="L138">                    bluetoothLogAdapter.add(logDataStringSplit[i])</span>
+                }
+<span class="fc" id="L140">                bluetoothLogAdapter.notifyDataSetChanged()</span>
+<span class="fc" id="L141">            }</span>
+
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">            mmSocket!!.close()</span>
+<span class="fc" id="L144">        }</span>
+    }
 
     private fun initializeViewsAndAdapters() {
-<span class="fc" id="L40">        bluetoothLogListView = findViewById(R.id.bluetooth_checkpoint_data_list_view)</span>
-<span class="fc" id="L41">        bluetoothLogArrayList = ArrayList()</span>
-<span class="pc bpc" id="L42" title="1 of 2 branches missed.">        bluetoothLogAdapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, bluetoothLogArrayList)</span>
+<span class="fc" id="L148">        itineraryListView = findViewById(R.id.itinerary_list_view)</span>
+<span class="fc" id="L149">        itineraryArrayList = ArrayList()</span>
+<span class="pc bpc" id="L150" title="1 of 2 branches missed.">        itineraryAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, itineraryArrayList)</span>
 
-<span class="pc bpc" id="L44" title="2 of 4 branches missed.">        bluetoothLogListView.adapter = bluetoothLogAdapter</span>
+<span class="pc bpc" id="L152" title="2 of 4 branches missed.">        itineraryListView.adapter = itineraryAdapter</span>
 
-<span class="fc" id="L46">        getDataButton = findViewById(R.id.get_data_button)</span>
+<span class="fc" id="L154">        bluetoothLogListView = findViewById(R.id.bluetooth_checkpoint_data_list_view)</span>
+<span class="fc" id="L155">        bluetoothLogArrayList = ArrayList()</span>
+<span class="pc bpc" id="L156" title="1 of 2 branches missed.">        bluetoothLogAdapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, bluetoothLogArrayList)</span>
 
-<span class="fc" id="L48">        profileInformation = findViewById(R.id.profile_information_text_view)</span>
-<span class="fc" id="L49">    }</span>
+<span class="pc bpc" id="L158" title="2 of 4 branches missed.">        bluetoothLogListView.adapter = bluetoothLogAdapter</span>
 
+<span class="fc" id="L160">        getDataButton = findViewById(R.id.get_data_button)</span>
+
+<span class="fc" id="L162">        profileInformation = findViewById(R.id.profile_information_text_view)</span>
+
+<span class="fc" id="L164">        mBlueToothAdapter = BluetoothAdapter.getDefaultAdapter()</span>
+
+<span class="fc" id="L166">        lastSeenUUID = UUID.fromString(UUID_STRING)</span>
+<span class="fc" id="L167">    }</span>
+
+    @SuppressLint(&quot;SetTextI18n&quot;)
     private fun pullProfileInformationFromExtras() {
-<span class="pc bpc" id="L52" title="1 of 2 branches missed.">        profileInformation.text = &quot;TARGET: &quot; + intent.getStringExtra(&quot;profile&quot;)</span>
-<span class="fc" id="L53">    }</span>
+<span class="pc bpc" id="L171" title="1 of 2 branches missed.">        profileInformation.text = &quot;NAME: &quot; + intent.getStringExtra(&quot;firstName&quot;) + &quot; &quot; +</span>
+<span class="fc" id="L172">                intent.getStringExtra(&quot;lastName&quot;) + &quot;\n&quot; +</span>
+<span class="fc" id="L173">                &quot;Date of Birth: &quot; +intent.getStringExtra(&quot;dateOfBirth&quot;)</span>
+
+<span class="pc bpc" id="L175" title="1 of 2 branches missed.">        userIdentifier = intent.getStringExtra(&quot;userIdentifier&quot;)!!</span>
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">        macAddress = intent.getStringExtra(&quot;macAddress&quot;)!!</span>
+
+<span class="fc" id="L178">        val queue = Volley.newRequestQueue(this)</span>
+<span class="fc" id="L179">        val urlString = getString(R.string.server_url) + getString(R.string.server_itinerary) +</span>
+<span class="pc bpc" id="L180" title="1 of 2 branches missed.">                userIdentifier</span>
+
+<span class="fc" id="L182">        val getItineraryRequest = JsonArrayRequest(</span>
+<span class="fc" id="L183">            Request.Method.GET, urlString, null,</span>
+<span class="fc" id="L184">            Response.Listener { response -&gt;</span>
+
+<span class="fc bfc" id="L186" title="All 2 branches covered.">                for (i in 0 until response.length()) {</span>
+<span class="fc" id="L187">                    val itineraryItemJSON = response.getJSONObject(i)</span>
+<span class="fc" id="L188">                    val itineraryItem = ItineraryItem(itineraryItemJSON)</span>
+
+<span class="fc" id="L190">                    itineraryArrayList.add(itineraryItem)</span>
+                }
+
+<span class="fc" id="L193">                itineraryAdapter.notifyDataSetChanged()</span>
+<span class="fc" id="L194">            },</span>
+<span class="fc" id="L195">            Response.ErrorListener {</span>
+<span class="nc" id="L196">                Toast.makeText(applicationContext, &quot;COULD NOT CONTACT SERVER&quot;, Toast.LENGTH_SHORT).show()</span>
+<span class="nc" id="L197">            })</span>
+
+<span class="fc" id="L199">        queue.add(getItineraryRequest)</span>
+<span class="fc" id="L200">    }</span>
+
+<span class="fc" id="L202">    companion object {</span>
+        private const val ACCESS_FINE_LOCATION = 1
+        private const val UUID_STRING = &quot;a3c8734a-0aea-439e-8e06-9d7098dcf3a8&quot;
+    }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span>Generated by the Android Gradle plugin 3.6.1</div></body></html>
